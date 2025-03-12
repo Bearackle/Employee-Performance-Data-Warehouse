@@ -1,0 +1,2 @@
+#Project Overview 
+The HR Analytics System is a data-driven solution designed to support human resource management through advanced data warehousing and Online Analytical Processing (OLAP) techniques. This project focuses on collecting, storing, and analyzing HR-related data to provide actionable insights for decision-making, such as employee performance, retention, recruitment trends, and workforce planning.
