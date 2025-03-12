@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{D2ABAB84-BF74-430A-B69E-9DC6D40DDA17}") = "SSAS_PERFORMANCE_PRODUCTIVITY", "SSAS_PERFORMANCE_PRODUCTIVITY.dwproj", "{71F84486-5262-4BCC-ABBB-F1427BB7BF2B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Development|Default = Development|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{71F84486-5262-4BCC-ABBB-F1427BB7BF2B}.Development|Default.ActiveCfg = Development
+		{71F84486-5262-4BCC-ABBB-F1427BB7BF2B}.Development|Default.Build.0 = Development
+		{71F84486-5262-4BCC-ABBB-F1427BB7BF2B}.Development|Default.Deploy.0 = Development
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FC20C073-9828-4452-A7A5-E55B0D45D03A}
+	EndGlobalSection
+EndGlobal
