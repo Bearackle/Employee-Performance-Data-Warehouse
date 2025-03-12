@@ -10,5 +10,5 @@ The **Employee Performance Data warehouse** is a data-driven solution designed t
   - Performance evaluation trends.  
   - Workforce diversity and inclusion metrics.
 - **Database**: SQL Server for data warehousing.
-- **Programming Languages**: [Specify, e.g., Python, SQL].
-- **Data Visualization**: Power BI, Google data studio
+- **Programming Languages**: MDX Query,SQL.
+- **Data Visualization**: Power BI, Google Data Studio.
