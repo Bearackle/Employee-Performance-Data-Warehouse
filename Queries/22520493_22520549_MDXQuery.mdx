@@ -1,0 +1,175 @@
+﻿-- Câu 1: Số lượng nhân viên theo từng phòng ban
+SELECT 
+	NON EMPTY [Measures].[Number of Employees] ON COLUMNS,
+	NON EMPTY ORDER([DIM DEPARTMENT].[DEPARTMENT].[DEPARTMENT].MEMBERS, [Measures].[Number of Employees], ASC) ON ROWS
+FROM [EMPLOYEE PERFORMANCE PRODUCTIVITY];
+
+-- Câu 2: Số lượng nhân viên theo vị trí công việc và trình độ học vấn
+SELECT
+	NON EMPTY [Measures].[Number of Employees] ON COLUMNS,
+	NON EMPTY CROSSJOIN(
+		[DIM JOB TITLE].[Job Title].[Job Title].MEMBERS,
+		[DIM EMPLOYEE].[Education Level].[Education Level].MEMBERS
+	) ON ROWS
+FROM [EMPLOYEE PERFORMANCE PRODUCTIVITY];
+
+-- Câu 3: Điểm đánh giá hiệu suất trung bình theo từng phòng ban
+WITH MEMBER [Measures].[AveragePerformanceScore] 
+	AS (SUM([Measures].[Performance Score]) / [Measures].[Number of Employees])
+SELECT 
+    [Measures].[AveragePerformanceScore] ON COLUMNS, 
+    NON EMPTY [DIM DEPARTMENT].[Department].[Department].MEMBERS ON ROWS
+FROM [EMPLOYEE PERFORMANCE PRODUCTIVITY];
+
+-- Câu 4: Lương trung bình theo phòng ban và vị trí công việc
+WITH MEMBER [Measures].[AverageMonthlySalary]
+	AS (SUM([Measures].[Monthly Salary]) / [Measures].[Number of Employees])
+SELECT
+	[Measures].[AverageMonthlySalary] ON COLUMNS,
+	NON EMPTY CROSSJOIN(
+		[DIM DEPARTMENT].[Department].[Department].MEMBERS,
+		[DIM JOB TITLE].[Job Title].[Job Title].MEMBERS
+	) ON ROWS
+FROM [EMPLOYEE PERFORMANCE PRODUCTIVITY];
+
+-- Câu 5: Số lượng nhân viên được tuyển dụng từ năm 2019 đến năm 2024, thực hiện drilldown từ năm sang quý
+SELECT
+	NON EMPTY [Measures].[Number of Employees] ON COLUMNS,
+	DRILLDOWNLEVEL(
+		{[DIM DATE].[Year Quarter].[Year].&[2019]:[DIM DATE].[Year Quarter].[Year].&[2024]}
+	) ON ROWS
+FROM [EMPLOYEE PERFORMANCE PRODUCTIVITY];
+
+-- Câu 6: Tỷ lệ nhân viên làm việc từ xa (100%) theo từng phòng ban
+WITH MEMBER [Measures].[AverageRemoteWorkFrequency]
+	AS (SUM([Measures].[Remote Work Frequency]) / [Measures].[Number of Employees])
+SELECT
+	[Measures].[AverageRemoteWorkFrequency] ON COLUMNS,
+	NON EMPTY [DIM DEPARTMENT].[Department].[Department].MEMBERS ON ROWS
+FROM [EMPLOYEE PERFORMANCE PRODUCTIVITY];
+
+-- Câu 7: Điểm hài lòng trung bình của nhân viên theo độ tuổi
+WITH MEMBER [Measures].[AverageEmployeeSatisfactionScore]
+	AS (SUM([Measures].[Employee Satisfaction Score]) / [Measures].[Number of Employees])
+SELECT
+	[Measures].[AverageEmployeeSatisfactionScore] ON COLUMNS,
+	NON EMPTY [DIM EMPLOYEE].[Age].MEMBERS ON ROWS
+FROM [EMPLOYEE PERFORMANCE PRODUCTIVITY];
+
+-- Câu 8: Số năm làm việc trung bình của nhân viên theo vị trí công việc
+WITH MEMBER [Measures].[AverageYearsAtCompany]
+	AS (SUM([Measures].[Years At Company]) / [Measures].[Number of Employees])
+SELECT
+	[Measures].[AverageYearsAtCompany] ON COLUMNS,
+	NON EMPTY [DIM JOB TITLE].[Job Title].[Job Title].MEMBERS ON ROWS
+FROM [EMPLOYEE PERFORMANCE PRODUCTIVITY];
+
+-- Câu 9: Liệt kê 5 vị trí công việc có lương tháng cao nhất
+WITH MEMBER [Measures].[AverageMonthlySalary]
+	AS (SUM([Measures].[Monthly Salary]) / [Measures].[Number of Employees])
+SELECT
+	[Measures].[AverageMonthlySalary] ON COLUMNS,
+	NON EMPTY TOPCOUNT([DIM JOB TITLE].[Job Title].[Job Title].MEMBERS, 5, [Measures].[Average Monthly Salary]) ON ROWS
+FROM [EMPLOYEE PERFORMANCE PRODUCTIVITY];
+
+-- Câu 10: Tỷ lệ chênh lệch giới tính trong các vị trí công việc
+WITH 
+    MEMBER [Measures].[MaleCount] AS 
+        SUM(
+            FILTER(
+                [DIM EMPLOYEE].[Employee ID].MEMBERS, 
+                [DIM EMPLOYEE].[Gender].CURRENTMEMBER.MEMBER_CAPTION = "Male"
+            ), 
+            [Measures].[Number of Employees]
+        )
+    MEMBER [Measures].[FemaleCount] AS 
+        SUM(
+            FILTER(
+                [DIM EMPLOYEE].[Employee ID].MEMBERS, 
+                [DIM EMPLOYEE].[Gender].CURRENTMEMBER.MEMBER_CAPTION = "Female"
+            ), 
+            [Measures].[Number of Employees]
+        )
+    MEMBER [Measures].[GenderDifference(%)] AS 
+        (([Measures].[MaleCount] / [Measures].[Number of Employees]) - ([Measures].[FemaleCount] / [Measures].[Number of Employees])) * 100,
+		 FORMAT_STRING = "0.00"
+SELECT 
+    {[Measures].[MaleCount], [Measures].[FemaleCount], [Measures].[GenderDifference(%)]} ON COLUMNS, 
+    NON EMPTY [DIM JOB TITLE].[Job Title].[Job Title].MEMBERS ON ROWS
+FROM [EMPLOYEE PERFORMANCE PRODUCTIVITY];
+
+-- Câu 11: Thời gian overtime trung bình từng tuần của nhân viên và số lượng project thực hiện theo từng ban ngành và vị trí công việc
+WITH 
+	MEMBER [Measures].[Average Overtime Hours] AS
+		(SUM([Measures].[Overtime Hours]) / [Measures].[Number of Employees])
+	MEMBER [Measures].[Average Team Size] AS
+		(SUM([Measures].[Team Size]) / [Measures].[Number of Employees])
+SELECT 
+	{[Measures].[Average Overtime Hours], [Measures].[Projects Handled], [Measures].[Average Team Size]} ON COLUMNS,
+	NON EMPTY CROSSJOIN(
+		[DIM DEPARTMENT].[Department].[Department].MEMBERS,
+		[DIM JOB TITLE].[Job Title].[Job Title].MEMBERS
+	) ON ROWS
+FROM [EMPLOYEE PERFORMANCE PRODUCTIVITY];
+
+-- Câu 12: Thống kê hiệu suất (Performance Score) của nhân viên theo từng bậc học vấn
+WITH MEMBER [Measures].[Average Performance Score] 
+	AS (SUM([Measures].[Performance Score]) / [Measures].[Number of Employees])
+SELECT 
+    [Measures].[Average Performance Score] ON COLUMNS, 
+    NON EMPTY [DIM EMPLOYEE].[Education Level].[Education Level].MEMBERS ON ROWS
+FROM [EMPLOYEE PERFORMANCE PRODUCTIVITY];
+
+-- Câu 13: Mức lương trung bình của nhân viên có tuổi lớn hơn 40 và đã làm việc hơn 5 năm theo vị trí công việc
+WITH 
+	MEMBER [Measures].[Filtered Employees Salary] AS
+		SUM(
+			FILTER(
+				[DIM EMPLOYEE].[Employee ID].[Employee ID].MEMBERS,
+				[DIM EMPLOYEE].[Age].CURRENTMEMBER.MEMBER_VALUE > 40 
+				AND [Measures].[Years At Company] >= 5
+			),
+			[Measures].[Monthly Salary]
+		)
+	MEMBER [Measures].[Filtered Employees Count] AS
+		COUNT(
+			FILTER(
+				[DIM EMPLOYEE].[Employee ID].[Employee ID].MEMBERS,
+				[DIM EMPLOYEE].[Age].CURRENTMEMBER.MEMBER_VALUE > 40 
+				AND [Measures].[Years At Company] >= 5
+			)
+		)
+	MEMBER [Measures].[Filtered Average Monthly Salary]
+		AS [Measures].[Filtered Employees Salary] / [Measures].[Filtered Employees Count]
+SELECT
+    [Measures].[Filtered Average Monthly Salary] ON COLUMNS,
+    NON EMPTY [DIM JOB TITLE].[Job Title].[Job Title].MEMBERS ON ROWS
+FROM [EMPLOYEE PERFORMANCE PRODUCTIVITY];
+
+-- Câu 14: Tỉ lệ nhân viên được thăng tiến từ 2 lần trở lên theo ban ngành
+WITH 
+	MEMBER [Measures].[Promoted Employees Count] AS
+		COUNT(
+			FILTER(
+				[DIM EMPLOYEE].[Employee ID].[Employee ID].MEMBERS,
+				[Measures].[Promotions] >= 2
+			)
+		)
+	MEMBER [Measures].[Promotion Rate] AS
+		IIF(
+            [Measures].[Number of Employees] > 0,
+            ([Measures].[Promoted Employees Count] / [Measures].[Number of Employees]) * 100,
+            NULL
+        )
+SELECT
+	[Measures].[Promotion Rate] ON COLUMNS,
+	NON EMPTY [DIM DEPARTMENT].[Department].[Department].MEMBERS ON ROWS
+FROM [EMPLOYEE PERFORMANCE PRODUCTIVITY];
+
+-- Câu 15: Top 3 phòng ban có hiệu suất công việc cao nhất
+WITH MEMBER [Measures].[Average Performance Score] 
+	AS (SUM([Measures].[Performance Score]) / [Measures].[Number of Employees])
+SELECT
+	[Measures].[Average Performance Score] ON COLUMNS,
+	NON EMPTY TOPCOUNT([DIM DEPARTMENT].[Department].[Department].MEMBERS, 3, [Measures].[Average Performance Score]) ON ROWS
+FROM [EMPLOYEE PERFORMANCE PRODUCTIVITY]
